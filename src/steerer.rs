@@ -2,15 +2,16 @@ use bevy::prelude::*;
 
 pub struct SteerMove {
     velocity: Vec3,
+    /// the direction the front of the Entity is facing when it has no rotation
     base_direction: Vec3,
     speed: f32,
 }
 
 impl SteerMove {
-    pub fn new(speed: f32, pointing_direction: Vec3) -> SteerMove {
+    pub fn new(speed: f32, base_direction: Vec3) -> SteerMove {
         SteerMove {
-            velocity: pointing_direction * speed,
-            base_direction: pointing_direction,
+            velocity: base_direction * speed,
+            base_direction,
             speed,
         }
     }
@@ -29,9 +30,5 @@ pub struct SteererPlugin;
 impl Plugin for SteererPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_system(steerer_movement.system());
-    }
-
-    fn name(&self) -> &str {
-        "SteererPlugin"
     }
 }

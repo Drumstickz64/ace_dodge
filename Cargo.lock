@@ -29,6 +29,7 @@ name = "ace_dodge"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "rand",
 ]
 
 [[package]]

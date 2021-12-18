@@ -1,4 +1,5 @@
 mod player;
+mod red_enemy;
 mod shared;
 mod steerer;
 
@@ -10,8 +11,11 @@ const SCREEN_WIDTH: f32 = 480.0;
 const SCREEN_HEIGHT: f32 = 640.0;
 const SCREEN_X: i32 = 1305;
 const SCREEN_Y: i32 = 0;
+
 const CLEAR_COLOR: Color = Color::rgb(0.47, 0.82, 0.89);
+
 const PLAYER_SPRITE: &'static str = "player_01.png";
+const RED_ENEMY_SPRITE: &'static str = "red_enemy_01.png";
 
 fn main() {
     App::build()
@@ -22,12 +26,14 @@ fn main() {
             height: SCREEN_HEIGHT,
             ..Default::default()
         })
-        .add_startup_system(position_window.system())
-        .add_startup_system(setup.system())
-        .add_startup_stage("game_setup", SystemStage::parallel())
+        .add_startup_stage("setup", SystemStage::parallel())
+        .add_startup_system_to_stage("setup", position_window.system())
+        .add_startup_system_to_stage("setup", setup.system())
+        .add_startup_stage_after("setup", "prelude", SystemStage::parallel())
         .add_plugins(DefaultPlugins)
         .add_plugin(steerer::SteererPlugin)
         .add_plugin(player::PlayerPlugin)
+        .add_plugin(red_enemy::RedEnemyPlugin)
         .run();
 }
 
@@ -38,8 +44,10 @@ fn setup(
 ) {
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
     let plane_mat_handle = asset_server.load(PLAYER_SPRITE);
+    let red_enemy_mat_handle = asset_server.load(RED_ENEMY_SPRITE);
     commands.insert_resource(Materials {
         plane_material: materials.add(plane_mat_handle.into()),
+        red_enemy_material: materials.add(red_enemy_mat_handle.into()),
     });
 }
 
