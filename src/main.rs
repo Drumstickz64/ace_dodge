@@ -1,8 +1,11 @@
+mod collision;
+mod enemy;
+mod math;
 mod player;
-mod red_enemy;
 mod shared;
 mod steerer;
 
+use bevy::app::AppExit;
 use bevy::prelude::*;
 use shared::Materials;
 
@@ -30,10 +33,11 @@ fn main() {
         .add_startup_system_to_stage("setup", position_window.system())
         .add_startup_system_to_stage("setup", setup.system())
         .add_startup_stage_after("setup", "prelude", SystemStage::parallel())
+        .add_system(handle_esc.system())
         .add_plugins(DefaultPlugins)
         .add_plugin(steerer::SteererPlugin)
         .add_plugin(player::PlayerPlugin)
-        .add_plugin(red_enemy::RedEnemyPlugin)
+        .add_plugin(enemy::EnemyPlugin)
         .run();
 }
 
@@ -56,4 +60,10 @@ fn position_window(mut windows: ResMut<Windows>) {
         .get_primary_mut()
         .unwrap()
         .set_position(IVec2::new(SCREEN_X, SCREEN_Y));
+}
+
+fn handle_esc(keyboard_input: Res<Input<KeyCode>>, mut exit_writer: EventWriter<AppExit>) {
+    if keyboard_input.pressed(KeyCode::Escape) {
+        exit_writer.send(AppExit);
+    }
 }
