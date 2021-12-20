@@ -41,11 +41,33 @@ fn player_turning(
     }
 }
 
+fn player_screen_wrap(mut players: Query<&mut Transform, With<Player>>, windows: Res<Windows>) {
+    let mut transform = players.iter_mut().nth(0).expect("There are no players!");
+    let mut pos = transform.translation;
+    let window = windows.get_primary().unwrap();
+    let (screen_width, screen_height) = (window.width(), window.height());
+    if pos.x < -screen_width / 2.0 {
+        pos.x = screen_width / 2.0;
+    } else if pos.x >= screen_width / 2.0 {
+        pos.x = -screen_width / 2.0;
+    }
+
+    if pos.y < -screen_height / 2.0 {
+        pos.y = screen_height / 2.0;
+    } else if pos.y >= screen_height / 2.0 {
+        pos.y = -screen_height / 2.0;
+    }
+    println!("{} : {}", transform.translation, pos);
+
+    transform.translation = pos;
+}
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_startup_system_to_stage("prelude", spawn.system())
-            .add_system(player_turning.system());
+            .add_system(player_turning.system())
+            .add_system(player_screen_wrap.system());
     }
 }
