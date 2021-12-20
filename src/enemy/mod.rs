@@ -2,17 +2,18 @@ mod common;
 mod red_enemy;
 mod yellow_enemy;
 
-use bevy::prelude::*;
+use bevy::{app::PluginGroupBuilder, prelude::*};
 use common::CommonEnemyPlugin;
 use red_enemy::RedEnemyPlugin;
 use yellow_enemy::YellowEnemyPlugin;
 
-pub struct EnemyPlugin;
+pub struct EnemyPlugins;
 
-impl Plugin for EnemyPlugin {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_plugin(CommonEnemyPlugin);
-        app.add_plugin(RedEnemyPlugin);
-        app.add_plugin(YellowEnemyPlugin);
+impl PluginGroup for EnemyPlugins {
+    fn build(&mut self, group: &mut PluginGroupBuilder) {
+        group
+            .add(CommonEnemyPlugin)
+            .add(RedEnemyPlugin)
+            .add(YellowEnemyPlugin);
     }
 }

@@ -5,6 +5,7 @@ use bevy::{prelude::*, sprite::collide_aabb::collide};
 
 use crate::collision::Collider;
 use crate::player::Player;
+use crate::shared::Score;
 
 pub const SIZE: (f32, f32) = (16.0, 16.0);
 pub const SPRITE_ROTATION_OFFSET: f32 = -TAU / 4.0;
@@ -14,6 +15,7 @@ pub struct Enemy;
 fn collision_with_enemies(
     mut commands: Commands,
     enemies: Query<(Entity, &GlobalTransform, &Collider), With<Enemy>>,
+    mut score: ResMut<Score>,
 ) {
     for (enemy, transform, collider) in enemies.iter() {
         let other_enemies = enemies.iter().filter(|(item, ..)| *item != enemy);
@@ -33,6 +35,7 @@ fn collision_with_enemies(
             if has_collided_with_enemy {
                 commands.entity(enemy).despawn();
                 commands.entity(other_enemy).despawn();
+                score.increase_by(1);
             };
         }
     }
