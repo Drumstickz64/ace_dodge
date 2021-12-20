@@ -4,4 +4,5 @@ use bevy::prelude::*;
 pub struct Materials {
     pub plane_material: Handle<ColorMaterial>,
     pub red_enemy_material: Handle<ColorMaterial>,
+    pub yellow_enemy_material: Handle<ColorMaterial>,
 }

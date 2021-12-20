@@ -19,6 +19,7 @@ const CLEAR_COLOR: Color = Color::rgb(0.47, 0.82, 0.89);
 
 const PLAYER_SPRITE: &'static str = "player_01.png";
 const RED_ENEMY_SPRITE: &'static str = "red_enemy_01.png";
+const YELLOW_ENEMY_SPRITE: &'static str = "yellow_enemy_01.png";
 
 fn main() {
     App::build()
@@ -49,9 +50,11 @@ fn setup(
     commands.spawn_bundle(OrthographicCameraBundle::new_2d());
     let plane_mat_handle = asset_server.load(PLAYER_SPRITE);
     let red_enemy_mat_handle = asset_server.load(RED_ENEMY_SPRITE);
+    let yellow_enemy_mat_handle = asset_server.load(YELLOW_ENEMY_SPRITE);
     commands.insert_resource(Materials {
         plane_material: materials.add(plane_mat_handle.into()),
         red_enemy_material: materials.add(red_enemy_mat_handle.into()),
+        yellow_enemy_material: materials.add(yellow_enemy_mat_handle.into()),
     });
 }
 

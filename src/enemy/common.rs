@@ -1,3 +1,5 @@
+use std::f32::consts::TAU;
+
 use bevy::app::AppExit;
 use bevy::{prelude::*, sprite::collide_aabb::collide};
 
@@ -5,6 +7,7 @@ use crate::collision::Collider;
 use crate::player::Player;
 
 pub const SIZE: (f32, f32) = (16.0, 16.0);
+pub const SPRITE_ROTATION_OFFSET: f32 = -TAU / 4.0;
 
 pub struct Enemy;
 
