@@ -12,6 +12,7 @@ use bevy::prelude::*;
 
 const SPEED: f32 = 4.5;
 const SPAWN_TIMESTEP: f64 = 1.0;
+const ROTATION_SLERP_AMOUNT: f32 = 0.05;
 
 struct RedEnemy;
 
@@ -47,7 +48,14 @@ fn turn_to_player(
         .to_owned();
     for mut enemy_transform in q.q0_mut().iter_mut() {
         let angle = angle_between_vec3(player_transform.translation, enemy_transform.translation);
-        enemy_transform.rotation = Quat::from_rotation_z(angle + SPRITE_ROTATION_OFFSET);
+        let target_rotation = Quat::from_rotation_z(angle + SPRITE_ROTATION_OFFSET);
+        let dot_product = enemy_transform.rotation.dot(target_rotation);
+        let rotation_direction = if dot_product >= 0.0 { 1.0 } else { -1.0 };
+        enemy_transform.rotation = Quat::slerp(
+            enemy_transform.rotation * rotation_direction,
+            target_rotation,
+            ROTATION_SLERP_AMOUNT,
+        );
     }
 }
 

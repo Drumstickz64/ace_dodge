@@ -57,7 +57,6 @@ fn player_screen_wrap(mut players: Query<&mut Transform, With<Player>>, windows:
     } else if pos.y >= screen_height / 2.0 {
         pos.y = -screen_height / 2.0;
     }
-    println!("{} : {}", transform.translation, pos);
 
     transform.translation = pos;
 }
