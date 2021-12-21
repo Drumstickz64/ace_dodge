@@ -3,7 +3,7 @@ use super::common::{Enemy, SIZE};
 use crate::collision::Collider;
 use crate::collision::PhysicsLayers;
 use crate::math::angle_between_vec3;
-use crate::math::calculate_vec3_at_edge_of_screen;
+use crate::math::random_position_at_edge_of_screen;
 use crate::shared::Materials;
 use crate::steerer::SteerMove;
 use bevy::core::FixedTimestep;
@@ -16,7 +16,8 @@ struct YellowEnemy;
 
 fn spawn(mut commands: Commands, materials: Res<Materials>, windows: Res<Windows>) {
     let window = windows.get_primary().unwrap();
-    let translation = calculate_vec3_at_edge_of_screen(window.width(), window.height());
+    let position = random_position_at_edge_of_screen(window.width(), window.height());
+    let translation = Vec3::new(position.0, position.1, 0.0);
     let angle_to_center = angle_between_vec3(Vec3::ZERO, translation);
     let rotation = Quat::from_rotation_z(angle_to_center + SPRITE_ROTATION_OFFSET);
     commands
