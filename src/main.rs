@@ -37,7 +37,7 @@ GOALS:
     // as of bevy 0.5, this is extremely annoying to implement because state is implemented using
     // run criteria and there is no easy way to have multiple run criteria on the same SystemSet
     [] add start and gameover states
-    [] Maybe: add increasing difficulty
+    [X] Maybe: add increasing difficulty
     [X] Maybe: add audio
 */
 
