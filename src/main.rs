@@ -8,9 +8,10 @@ mod steerer;
 use bevy::app::AppExit;
 use bevy::core::FixedTimestep;
 use bevy::prelude::*;
+use bevy_kira_audio::{Audio, AudioChannel, AudioPlugin};
 use enemy::EnemyPlugins;
 use player::PlayerPlugin;
-use shared::{Fonts, Materials, Score};
+use shared::{BGMusic, Fonts, Materials, Score, SoundEffects};
 use steerer::SteererPlugin;
 
 const TITLE: &'static str = "Ace Dodge";
@@ -26,14 +27,18 @@ const PLAYER_SPRITE: &'static str = "player_01.png";
 const RED_ENEMY_SPRITE: &'static str = "red_enemy_01.png";
 const YELLOW_ENEMY_SPRITE: &'static str = "yellow_enemy_01.png";
 const FONT: &str = "Montserrat-Bold.ttf";
+const BG_MUSIC: &str = "flight_of_the_bumblebee.mp3";
+const PLANE_SFX: &str = "airplane_sound.mp3";
 
 /*
 GOALS:
     [X] add score
     [X] add gui
+    // as of bevy 0.5, this is extremely annoying to implement because state is implemented using
+    // run criteria and there is no easy way to have multiple run criteria on the same SystemSet
     [] add start and gameover states
     [] Maybe: add increasing difficulty
-    [] Maybe: add audio
+    [X] Maybe: add audio
 */
 
 fn main() {
@@ -47,9 +52,10 @@ fn main() {
         })
         .insert_resource(Score(0))
         .add_startup_stage("setup", SystemStage::parallel())
-        .add_startup_system_to_stage("setup", position_window.system())
+        .add_startup_system_to_stage("setup", setup_window.system())
         .add_startup_system_to_stage("setup", setup.system())
         .add_startup_stage_after("setup", "prelude", SystemStage::parallel())
+        .add_startup_system_to_stage("prelude", play_audio.system())
         .add_startup_system_to_stage("prelude", spawn_ui.system())
         .add_system(handle_esc.system())
         .add_system(
@@ -59,6 +65,7 @@ fn main() {
         )
         .add_system(update_score_label.system())
         .add_plugins(DefaultPlugins)
+        .add_plugin(AudioPlugin)
         .add_plugin(SteererPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugins(EnemyPlugins)
@@ -83,20 +90,34 @@ fn setup(
     let font_handle = asset_server.load(FONT);
     commands.insert_resource(Fonts {
         main_font: font_handle,
+    });
+    commands.insert_resource(BGMusic {
+        handle: asset_server.load(BG_MUSIC),
+        channel: AudioChannel::new("music".to_string()),
+    });
+    commands.insert_resource(SoundEffects {
+        plane_handle: asset_server.load(PLANE_SFX),
+        channel: AudioChannel::new("sfx".to_string()),
     })
 }
 
-fn position_window(mut windows: ResMut<Windows>) {
-    windows
-        .get_primary_mut()
-        .unwrap()
-        .set_position(IVec2::new(SCREEN_X, SCREEN_Y));
+fn setup_window(mut windows: ResMut<Windows>) {
+    let primary_window = windows.get_primary_mut().expect("No windows found");
+    primary_window.set_resizable(false);
+    primary_window.set_position(IVec2::new(SCREEN_X, SCREEN_Y));
 }
 
 fn handle_esc(keyboard_input: Res<Input<KeyCode>>, mut exit_writer: EventWriter<AppExit>) {
     if keyboard_input.pressed(KeyCode::Escape) {
         exit_writer.send(AppExit);
     }
+}
+
+fn play_audio(audio: Res<Audio>, bg_music: Res<BGMusic>, sfx: Res<SoundEffects>) {
+    audio.set_volume_in_channel(1.5, &bg_music.channel);
+    audio.set_volume_in_channel(0.25, &sfx.channel);
+    audio.play_looped_in_channel(bg_music.handle.clone(), &bg_music.channel);
+    audio.play_looped_in_channel(sfx.plane_handle.clone(), &sfx.channel);
 }
 
 struct ScoreLabel;

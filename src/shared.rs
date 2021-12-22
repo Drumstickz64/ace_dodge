@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_kira_audio::{AudioChannel, AudioSource};
 
 /// A global store of all materials used in the game
 pub struct Materials {
@@ -21,4 +22,14 @@ impl Score {
     pub fn increase_by(&mut self, value: u32) {
         self.set(self.0 + value);
     }
+}
+
+pub struct BGMusic {
+    pub handle: Handle<AudioSource>,
+    pub channel: AudioChannel,
+}
+
+pub struct SoundEffects {
+    pub plane_handle: Handle<AudioSource>,
+    pub channel: AudioChannel,
 }
