@@ -39,6 +39,7 @@ GOALS:
     [] add start and gameover states
     [X] Maybe: add increasing difficulty
     [X] Maybe: add audio
+    [] Maybe: add warning before enemy spawns
 */
 
 fn main() {
@@ -156,6 +157,9 @@ fn spawn_ui(mut commands: Commands, fonts: Res<Fonts>) {
 
 // ideally would be using an event
 fn update_score_label(mut label: Query<&mut Text, With<ScoreLabel>>, score: Res<Score>) {
+    if !score.is_changed() {
+        return;
+    }
     for mut text in label.iter_mut() {
         text.sections[0].value = format!("{}", score.0);
     }

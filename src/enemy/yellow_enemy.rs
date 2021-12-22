@@ -53,6 +53,9 @@ fn spawn(
 }
 
 fn update_stats(mut stats: ResMut<Stats>, score: Res<Score>) {
+    if !score.is_changed() {
+        return;
+    }
     stats.amount_per_spawn = u32::min(1 + (score.0 as f32 * 0.05) as u32, 4);
 }
 

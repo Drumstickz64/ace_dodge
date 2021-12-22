@@ -83,6 +83,9 @@ fn turn_to_player(
 }
 
 fn update_stats(mut stats: ResMut<Stats>, score: Res<Score>) {
+    if !score.is_changed() {
+        return;
+    }
     stats.speed_multiplier = f32::min(1.0 + score.0 as f32 * 0.01875, 1.5);
     stats.amount_per_spawn = u32::min(1 + (score.0 as f32 * 0.025) as u32, 3);
 }
