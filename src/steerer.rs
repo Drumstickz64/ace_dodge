@@ -1,3 +1,4 @@
+/// A Steerer is an entity that automatically moves in a given forward direction.
 use bevy::prelude::*;
 
 pub struct SteerMove {
@@ -8,10 +9,10 @@ pub struct SteerMove {
 }
 
 impl SteerMove {
-    pub fn new(speed: f32, base_direction: Vec3) -> SteerMove {
+    pub fn new(speed: f32, front_direction: Vec3) -> SteerMove {
         SteerMove {
-            velocity: base_direction * speed,
-            front_direction: base_direction,
+            velocity: front_direction * speed,
+            front_direction,
             speed,
         }
     }
