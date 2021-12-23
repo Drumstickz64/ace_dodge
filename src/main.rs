@@ -4,6 +4,7 @@ mod math;
 mod player;
 mod shared;
 mod steerer;
+mod ui;
 
 use bevy::app::AppExit;
 use bevy::core::FixedTimestep;
@@ -13,6 +14,7 @@ use enemy::EnemyPlugins;
 use player::PlayerPlugin;
 use shared::{BGMusic, Fonts, Materials, Score, SoundEffects};
 use steerer::SteererPlugin;
+use ui::UiPlugin;
 
 const TITLE: &'static str = "Ace Dodge";
 const SCREEN_WIDTH: f32 = 480.0;
@@ -56,17 +58,16 @@ fn main() {
         .add_startup_system_to_stage("setup", setup_window.system())
         .add_startup_system_to_stage("setup", setup.system())
         .add_startup_stage_after("setup", "prelude", SystemStage::parallel())
-        .add_startup_system_to_stage("prelude", play_audio.system())
-        .add_startup_system_to_stage("prelude", spawn_ui.system())
         .add_system(handle_esc.system())
+        .add_startup_system_to_stage("prelude", play_audio.system())
         .add_system(
             increment_score
                 .system()
                 .with_run_criteria(FixedTimestep::step(INCREMENT_SCORE_STEP)),
         )
-        .add_system(update_score_label.system())
         .add_plugins(DefaultPlugins)
         .add_plugin(AudioPlugin)
+        .add_plugin(UiPlugin)
         .add_plugin(SteererPlugin)
         .add_plugin(PlayerPlugin)
         .add_plugins(EnemyPlugins)
@@ -119,50 +120,6 @@ fn play_audio(audio: Res<Audio>, bg_music: Res<BGMusic>, sfx: Res<SoundEffects>)
     audio.set_volume_in_channel(0.25, &sfx.channel);
     audio.play_looped_in_channel(bg_music.handle.clone(), &bg_music.channel);
     audio.play_looped_in_channel(sfx.plane_handle.clone(), &sfx.channel);
-}
-
-struct ScoreLabel;
-
-fn spawn_ui(mut commands: Commands, fonts: Res<Fonts>) {
-    commands.spawn_bundle(UiCameraBundle::default());
-    commands
-        .spawn_bundle(TextBundle {
-            text: Text::with_section(
-                "0",
-                TextStyle {
-                    font: fonts.main_font.clone(),
-                    font_size: 48.0,
-                    ..Default::default()
-                },
-                TextAlignment {
-                    vertical: VerticalAlign::Center,
-                    horizontal: HorizontalAlign::Center,
-                },
-            ),
-            style: Style {
-                display: Display::Flex,
-                margin: Rect {
-                    left: Val::Auto,
-                    top: Val::Percent(5.0),
-                    right: Val::Auto,
-                    ..Default::default()
-                },
-                align_self: AlignSelf::FlexEnd,
-                ..Default::default()
-            },
-            ..Default::default()
-        })
-        .insert(ScoreLabel);
-}
-
-// ideally would be using an event
-fn update_score_label(mut label: Query<&mut Text, With<ScoreLabel>>, score: Res<Score>) {
-    if !score.is_changed() {
-        return;
-    }
-    for mut text in label.iter_mut() {
-        text.sections[0].value = format!("{}", score.0);
-    }
 }
 
 fn increment_score(mut score: ResMut<Score>) {
